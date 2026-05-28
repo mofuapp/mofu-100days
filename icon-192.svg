@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="44" fill="#F3EEFF"/>
+  <circle cx="96" cy="96" r="68" fill="#fff" stroke="#9B7FD4" stroke-width="4"/>
+  <text x="96" y="88" text-anchor="middle" font-family="system-ui,sans-serif" font-size="44" font-weight="800" fill="#9B7FD4">100</text>
+  <text x="96" y="122" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#6B5B95">制作ボード</text>
+  <circle cx="148" cy="44" r="10" fill="#FFB8D0"/>
+  <circle cx="44" cy="148" r="8" fill="#B8E8D0"/>
+  <circle cx="160" cy="140" r="6" fill="#FFE4A0"/>
+</svg>

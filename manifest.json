@@ -1,0 +1,13 @@
+{
+  "name": "もふスタ100日 制作ボード",
+  "short_name": "100日制作",
+  "description": "100日チャレンジ動画コンテンツの制作進捗管理",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F3EEFF",
+  "theme_color": "#9B7FD4",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
