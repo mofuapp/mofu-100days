@@ -220,6 +220,48 @@ body::before{
 
 .empty-msg{text-align:center;padding:40px 20px;color:var(--ink-light);font-size:13px;line-height:1.8}
 .section-label{font-size:12px;font-weight:800;color:var(--purple);letter-spacing:.08em;margin:16px 0 10px;padding-left:4px}
+.section-label-row{display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px;padding-left:4px}
+.section-label-row .section-label{margin:0}
+.copy-btn{
+  border:2px solid var(--purple-light);background:var(--white);color:var(--purple);
+  font-family:inherit;font-size:11px;font-weight:800;padding:5px 12px;border-radius:999px;cursor:pointer;
+}
+.copy-btn:active{background:var(--purple-bg)}
+.copy-btn.ok{background:var(--mint);border-color:var(--mint);color:#2D6B4F}
+.detail-time{
+  display:inline-flex;align-items:center;gap:6px;background:var(--yellow);
+  border:2px solid #F5D76E;border-radius:999px;padding:5px 12px;
+  font-size:11px;font-weight:800;color:var(--ink-soft);margin-bottom:12px;
+}
+.script-box{
+  background:var(--white);border:2.5px solid var(--purple);border-radius:18px;
+  padding:16px;margin-bottom:16px;box-shadow:0 4px 0 rgba(155,127,212,.12);
+}
+.script-section{margin-bottom:14px}
+.script-section:last-child{margin-bottom:0}
+.script-tag{
+  display:inline-block;background:var(--purple);color:var(--white);
+  font-size:10px;font-weight:800;padding:3px 10px;border-radius:999px;margin-bottom:8px;letter-spacing:.06em;
+}
+.script-tag.open{background:#7BC89E}
+.script-tag.body{background:var(--purple)}
+.script-tag.close{background:var(--pink);color:var(--ink)}
+.script-text{font-size:13px;line-height:1.85;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.info-box{
+  background:var(--white);border:2px solid var(--purple-light);border-radius:16px;
+  padding:14px;margin-bottom:14px;
+}
+.info-box-title{font-size:11px;font-weight:800;color:var(--purple);margin-bottom:8px;letter-spacing:.06em}
+.prep-list,.demo-list{margin:0;padding:0;list-style:none}
+.prep-list li,.demo-list li{
+  font-size:13px;line-height:1.7;color:var(--ink-soft);padding:6px 0;
+  border-bottom:1px dashed var(--purple-light);display:flex;gap:8px;
+}
+.prep-list li:last-child,.demo-list li:last-child{border-bottom:none}
+.prep-list li::before{content:'□';color:var(--purple);font-weight:800;flex-shrink:0}
+.demo-list li::before{content:'▶';color:var(--purple);font-size:10px;flex-shrink:0;margin-top:3px}
+.mosh-text,.hw-text{font-size:13px;line-height:1.75;color:var(--ink-soft)}
+.hw-box{background:linear-gradient(135deg,#fff,#F3EEFF);border-color:var(--purple)}
 </style>
 </head>
 <body>
@@ -300,11 +342,35 @@ body::before{
     <div class="detail-title" id="detail-title"></div>
   </div>
   <div class="scroll-body" style="padding-top:0">
-    <div class="detail-desc" id="detail-desc"></div>
-    <div class="section-label">制作ステップ</div>
+    <div class="detail-time" id="detail-time">⏱ 5〜8分</div>
+    <div class="info-box">
+      <div class="info-box-title">🎒 準備するもの</div>
+      <ul class="prep-list" id="detail-prep"></ul>
+    </div>
+    <div class="section-label-row">
+      <div class="section-label">📝 収録台本（そのまま読む）</div>
+      <button class="copy-btn" id="copy-script-btn" type="button">台本コピー</button>
+    </div>
+    <div class="script-box" id="detail-script"></div>
+    <div class="info-box">
+      <div class="info-box-title">🎥 画面収録でやること</div>
+      <ol class="demo-list" id="detail-demo"></ol>
+    </div>
+    <div class="info-box">
+      <div class="section-label-row" style="margin:0 0 8px;padding:0">
+        <div class="info-box-title" style="margin:0">📋 MOSH掲載文</div>
+        <button class="copy-btn" id="copy-mosh-btn" type="button">コピー</button>
+      </div>
+      <div class="mosh-text" id="detail-mosh"></div>
+    </div>
+    <div class="info-box hw-box">
+      <div class="info-box-title">✅ 受講生の宿題</div>
+      <div class="hw-text" id="detail-homework"></div>
+    </div>
+    <div class="section-label">制作ステップ（自分用チェック）</div>
     <div class="step-list" id="step-list"></div>
     <div class="section-label">メモ</div>
-    <textarea class="detail-memo" id="detail-memo" placeholder="台本のメモ、収録日、気づきなど…"></textarea>
+    <textarea class="detail-memo" id="detail-memo" placeholder="収録日、NGテイク、気づきなど…"></textarea>
   </div>
 </div>
 
@@ -315,10 +381,12 @@ body::before{
   <button class="nav-item" data-screen="focus"><span class="nav-icon">🎬</span>制作中</button>
 </nav>
 
+<script src="days-data.js"></script>
 <script>
 const STEPS=['script','record','edit','publish'];
 const STEP_LABELS={script:'📝 台本',record:'🎥 収録',edit:'✂️ 編集',publish:'🚀 MOSH公開'};
 const STORAGE_KEY='mofu100days-v1';
+const DAYS=window.COURSE_DAYS||[];
 
 const PHASES=[
   {id:0,name:'はじめの一歩',emoji:'🌱',range:[1,7],color:'#B8E8D0'},
@@ -328,108 +396,6 @@ const PHASES=[
   {id:4,name:'フォロワー100人',emoji:'🌟',range:[76,100],color:'#FF9EB5'}
 ];
 
-const DAYS=[
-{d:1,t:'100日チャレンジの全体像と、ChatGPTの準備',b:'ゴール説明。ChatGPTアカウント作成・有料プラン確認。Discord・MOSHの使い方。'},
-{d:2,t:'プロンプト1行で、最初の1枚を作る',b:'「かわいい女の子のイラスト」で生成。生成→保存までの基本操作。'},
-{d:3,t:'言葉を変えると絵が変わる！修正の基本',b:'前日の画像を日本語で修正。AIへの指示＝会話の感覚を体得。'},
-{d:4,t:'5要素プロンプトで狙い通りに近づける',b:'誰・何を・雰囲気・構図・画風の5つを意識。プロンプトの型をテンプレ化。'},
-{d:5,t:'3テーマで「自分の好き」を探す',b:'かわいい系／大人っぽい系／ファンタジー系を1枚ずつ。好みメモの書き方。'},
-{d:6,t:'Before/Afterでクオリティを上げる',b:'気に入った1枚を3回修正。何を変えたらどう変わったか記録。'},
-{d:7,t:'Week1振り返り｜ベスト3と好きな理由',b:'今週のベスト3選定。なぜ好きか3行で書く。来週の目標設定。'},
-{d:8,t:'髪型・目・服装を1つずつ指定する',b:'パーツ別プロンプト。髪型→目→服装の順で指定。'},
-{d:9,t:'表情4種類を作り分ける',b:'笑顔・困り顔・照れ顔・真剣顔を4枚。表情ワード集。'},
-{d:10,t:'ポーズ4種類を作り分ける',b:'立ち・座り・手を振る・横向き。ポーズ指定のコツ。'},
-{d:11,t:'構図4種類を作り分ける',b:'全身・バストアップ・アップ・斜め構図。構図ワード集。'},
-{d:12,t:'背景4種類を作り分ける',b:'白背景・室内・屋外・シンプルな柄。背景で雰囲気が変わる体験。'},
-{d:13,t:'画風4種類を試す',b:'アニメ調・水彩・フラット・ゆるい線画。自分に合う画風の発見。'},
-{d:14,t:'Week2振り返り｜プロンプト全文で再現する',b:'ベスト1枚をプロンプト全文で再現。パーツ別練習のまとめ。'},
-{d:15,t:'好きなパーツを1枚に統合する①',b:'髪型＋表情＋ポーズを組み合わせ。統合プロンプトの書き方。'},
-{d:16,t:'好きなパーツを1枚に統合する②',b:'画風＋背景＋構図を組み合わせ。統合の順番のコツ。'},
-{d:17,t:'小物を添えて世界観を広げる',b:'花・本・カップ・動物を1つずつ持たせる。小物指定の例文。'},
-{d:18,t:'配色で同じキャラの印象を変える',b:'パステル・モノトーン・ビビッドで3枚。配色ワード集。'},
-{d:19,t:'同じキャラで春夏秋冬4枚シリーズ',b:'季節要素の入れ方。シリーズ感の出し方。'},
-{d:20,t:'統一感のある3枚を作る',b:'同じ世界観・色味で3枚。統一感チェックリスト。'},
-{d:21,t:'Week3振り返り｜自分の定番プロンプトを作る',b:'定番プロンプト1つ完成。今後のベースとして保存。'},
-{d:22,t:'ChatGPTの限界を知る｜MJ移行前の準備',b:'手・統一感・細かい指定の難しさ。限界メモとMidjourney移行の理由。'},
-{d:23,t:'Midjourneyの準備・登録・アカウント設定',b:'MJアカウント作成・Discord参加。基本画面の見方。'},
-{d:24,t:'ChatGPTプロンプトを英語に翻訳する',b:'使っていたプロンプトを英語化。翻訳のコツと基本単語。'},
-{d:25,t:'ChatGPT vs Midjourney｜同じプロンプトで比較',b:'同じ内容を両方で生成。違いを3つ書く。Phase1総まとめ。'},
-{d:26,t:'Midjourneyで最初の1枚を作る',b:'/imagine の使い方。初回生成〜保存まで。'},
-{d:27,t:'UpscaleとVariationでベストを選ぶ',b:'U1〜U4、V1〜V4の使い分け。良い絵の選び方。'},
-{d:28,t:'MJプロンプトの基本構造を理解する',b:'主語＋詳細＋画風＋品質ワード。基本テンプレ。'},
-{d:29,t:'アスペクト比（--ar）でサイズを変える',b:'1:1／16:9／9:16で同じプロンプト。用途別サイズ。'},
-{d:30,t:'stylize（--stylize）で画風の強さを調整',b:'低・中・高で比較。自分好みの数値を見つける。'},
-{d:31,t:'chaos（--chaos）でバリエーションを増やす',b:'0／50／100で比較。意外性と安定性のバランス。'},
-{d:32,t:'ネガティブプロンプト（--no）で不要要素を消す',b:'余計な要素の除外。よく使う --no 例。'},
-{d:33,t:'同じプロンプトで5回生成してベストを選ぶ',b:'リロールの活用。当たり引きのコツ。'},
-{d:34,t:'失敗例から学ぶ｜うまくいかない原因の見つけ方',b:'失敗3枚＋原因分析。よくある失敗パターン。'},
-{d:35,t:'Week5振り返り｜MJベスト5枚を整理する',b:'ベスト5＋プロンプト保存。フォルダ整理。'},
-{d:36,t:'かわいい系テイストのプロンプト例',b:'かわいい系ワード集から3枚。定番表現。'},
-{d:37,t:'大人っぽい・綺麗系テイストのプロンプト例',b:'大人っぽい系ワード集から3枚。'},
-{d:38,t:'アニメ調・水彩など他テイストのプロンプト例',b:'画風バリエーション3枚。'},
-{d:39,t:'構図5種類をMJで再現する',b:'ChatGPTで練習した構図をMJで再現。'},
-{d:40,t:'表情・ポーズをMJで再現する',b:'表情・ポーズ指定のMJ版。'},
-{d:41,t:'背景と小物の組み合わせ3枚',b:'背景＋小物の指定。世界観の作り方。'},
-{d:42,t:'同じキャラで統一感を出す① seed・style',b:'seed／style referenceの基本。3枚そろえる。'},
-{d:43,t:'同じキャラで統一感を出す② 色味・画風固定',b:'色味・画風を固定した4枚シリーズ。'},
-{d:44,t:'アイコン用イラストの作り方',b:'1:1・顔アップ・アイコン向き。SNSアイコン向け。'},
-{d:45,t:'投稿用イラストの作り方',b:'4:5 or 16:9。フィード投稿サイズ。'},
-{d:46,t:'ヘッダー・バナー用イラストの作り方',b:'横長バナー。X/インスタヘッダー向け。'},
-{d:47,t:'推しの子① キャラ設定シートを作る',b:'名前・性格・見た目・好きなもの。設定シート完成。'},
-{d:48,t:'推しの子② 3バリエーションを描く',b:'設定シートをもとに3パターン。'},
-{d:49,t:'ポートフォリオ10枚を整理する',b:'ベスト10枚選定。フォルダ・命名ルール。'},
-{d:50,t:'中間総仕上げ｜今の最高傑作1枚',b:'Phase2まとめ。推しの子＋用途別1枚ずつの確認。'},
-{d:51,t:'X or インスタ、どっちで発信する？',b:'SNS選定。1つに絞る理由。'},
-{d:52,t:'プロフィール設計｜アイコン・bio・固定投稿',b:'アイコン・名前・bio・固定投稿の設計。'},
-{d:53,t:'初投稿｜自己紹介＋作品1枚',b:'自己紹介文テンプレ。初投稿の型。'},
-{d:54,t:'制作過程投稿（Before/After）',b:'修正前後の見せ方。伸びやすい型。'},
-{d:55,t:'好きなテイストの作品を投稿する',b:'推しの子 or ベスト作品。キャプションの書き方。'},
-{d:56,t:'交流の基本｜いいね＋コメント5人',b:'同ジャンル5人へのリアクション。交流のコツ。'},
-{d:57,t:'Week9振り返り｜1週間の反応を分析する',b:'いいね・フォロワー・伸びた投稿のメモ。'},
-{d:58,t:'推しの子シリーズ① 新規1枚制作',b:'推しの子の新バリエーション。'},
-{d:59,t:'推しの子シリーズ② 修正・バリエーション',b:'前日の修正 or 別ポーズ。'},
-{d:60,t:'推しの子シリーズ③ 週1投稿',b:'今週の投稿1本目。'},
-{d:61,t:'推しの子シリーズ④ 新規1枚',b:'シリーズ続き。'},
-{d:62,t:'推しの子シリーズ⑤ 修正',b:'クオリティアップ。'},
-{d:63,t:'推しの子シリーズ⑥ 週2投稿',b:'今週の投稿2本目。'},
-{d:64,t:'推しの子シリーズ⑦ 振り返り',b:'Week10まとめ。ベスト1枚選定。'},
-{d:65,t:'季節・イベントネタ① 新規1枚',b:'季節/イベントをテーマに1枚。'},
-{d:66,t:'季節・イベントネタ② バリエーション',b:'別構図 or 別小物。'},
-{d:67,t:'季節・イベントネタ③ 週3投稿',b:'今週の投稿3本目。'},
-{d:68,t:'季節・イベントネタ④ 新規1枚',b:'ネタ続き。'},
-{d:69,t:'季節・イベントネタ⑤ 自由制作',b:'好きなテーマで1枚。'},
-{d:70,t:'季節・イベントネタ⑥ 週4投稿',b:'今週の投稿4本目。'},
-{d:71,t:'Week11振り返り｜投稿15本達成チェック',b:'投稿数・フォロワー数確認。20〜30人が目安。'},
-{d:72,t:'伸びる型① 制作過程＋プロンプト一部公開',b:'プロンプト公開のコツ。'},
-{d:73,t:'伸びる型② 「〇〇な子を描いてみた」',b:'テーマ型投稿。'},
-{d:74,t:'伸びる型③ 質問箱・投票「次どれ描こう？」',b:'エンゲージメント型。'},
-{d:75,t:'Phase3振り返り｜伸びた投稿TOP3分析',b:'なぜ伸びたか分析。Phase4への準備。'},
-{d:76,t:'100日チャレンジ Day76 シリーズ開始',b:'「Day XX」シリーズ化。残り25日の戦略。'},
-{d:77,t:'週4投稿リズムの作り方',b:'月・水・金・土投稿の型。'},
-{d:78,t:'毎日5人交流の習慣化',b:'リアクション5人＋週2深いコメント。'},
-{d:79,t:'Discord・コミュニティ内シェア',b:'相互フォロー・応援の仕方。'},
-{d:80,t:'Week13振り返り｜フォロワー数チェック',b:'現状と目標のギャップ。'},
-{d:81,t:'ベスト作品を再投稿する①',b:'過去ベスト1枚を再投稿。'},
-{d:82,t:'ベスト作品を再投稿する②',b:'2枚目。'},
-{d:83,t:'伸びなかった投稿の改善',b:'分析→次の1枚に反映。'},
-{d:84,t:'100日チャレンジ参加者と相互フォロー',b:'コミュニティ内交流。'},
-{d:85,t:'Week14振り返り｜フォロワー70人前後チェック',b:'中間目標確認。'},
-{d:86,t:'ベスト5枚をピン留め・プロフィール更新',b:'プロフィール最適化。'},
-{d:87,t:'「100日でこう変わった」まとめ投稿①',b:'Before/After・学び3つ。'},
-{d:88,t:'「100日でこう変わった」まとめ投稿②',b:'制作過程まとめ。'},
-{d:89,t:'フォロワー向け感謝投稿',b:'交流してくれた人への感謝。'},
-{d:90,t:'ラストスパート開始｜残り10日の計画',b:'最終10日の投稿計画。フォロワー100人まであと何人か確認。'},
-{d:91,t:'ラストスパート｜ベスト作品投稿',b:'今の最高傑作1枚を投稿。'},
-{d:92,t:'ラストスパート｜推しの子新規',b:'推しの子の最新版を1枚制作・投稿。'},
-{d:93,t:'ラストスパート｜制作過程',b:'過程公開でエンゲージメントを取る。'},
-{d:94,t:'卒業制作① テーマとコンセプトを決める',b:'100日の集大成として作る作品のテーマ決め。設定シート・参考メモ。'},
-{d:95,t:'卒業制作② 制作スタート',b:'卒業制作の初稿生成。プロンプト調整・修正。'},
-{d:96,t:'卒業制作③ 仕上げと完成',b:'クオリティアップ・最終調整。完成品を保存。'},
-{d:97,t:'卒業制作を公開する',b:'卒業制作をSNS投稿。100日の学び3つを添える。'},
-{d:98,t:'100日総まとめ｜ベスト10枚を振り返る',b:'ベスト10枚選定。最初と今のBefore/After。'},
-{d:99,t:'フォロワー100人達成チェック＆次の目標',b:'達成確認 or あと何人。次の100日の目標設定。'},
-{d:100,t:'100日完走｜これからも続けるコツ',b:'完走おめでとう。週3投稿・交流の習慣化。次のステップ案内。'}
-];
 
 const CHEERS=[
 [0,'まずは Day1 から！一歩ずついこう ✨'],
@@ -569,13 +535,40 @@ function renderFocus(){
   });
 }
 
+function formatScript(text){
+  if(!text)return '<p class="script-text">台本データなし</p>';
+  const parts=text.split(/(?=【)/);
+  return parts.filter(Boolean).map(part=>{
+    const m=part.match(/^【(.+?)】\n?([\s\S]*)/);
+    if(!m)return `<div class="script-section"><div class="script-text">${esc(part)}</div></div>`;
+    const tag=m[1],body=m[2].trim();
+    const cls=tag.includes('オープニング')?'open':tag.includes('クロージング')?'close':'body';
+    return `<div class="script-section"><div class="script-tag ${cls}">${esc(tag)}</div><div class="script-text">${esc(body)}</div></div>`;
+  }).join('');
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+async function copyText(text,btn){
+  try{
+    await navigator.clipboard.writeText(text);
+    if(btn){btn.classList.add('ok');btn.textContent='コピー済✓';setTimeout(()=>{btn.classList.remove('ok');btn.textContent=btn.dataset.label||'コピー'},1500)}
+  }catch{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+  }
+}
+
 function openDetail(d){
   currentDay=d;
   const day=DAYS.find(x=>x.d===d);
+  if(!day)return;
   const st=getDay(d);
   document.getElementById('detail-badge').textContent='Day '+d;
   document.getElementById('detail-title').textContent=day.t;
-  document.getElementById('detail-desc').textContent=day.b;
+  document.getElementById('detail-time').textContent='⏱ '+(day.time||'5〜8分');
+  document.getElementById('detail-prep').innerHTML=(day.prep||[]).map(p=>`<li>${esc(p)}</li>`).join('');
+  document.getElementById('detail-script').innerHTML=formatScript(day.script||'');
+  document.getElementById('detail-demo').innerHTML=(day.demo||[]).map(s=>`<li>${esc(s)}</li>`).join('');
+  document.getElementById('detail-mosh').textContent=day.mosh||day.b||'';
+  document.getElementById('detail-homework').textContent=day.homework||'';
   document.getElementById('detail-memo').value=st.memo||'';
   document.getElementById('step-list').innerHTML=STEPS.map(s=>`
     <div class="step-row${st.steps[s]?' done':''}" data-step="${s}">
@@ -585,6 +578,12 @@ function openDetail(d){
   document.getElementById('step-list').querySelectorAll('.step-row').forEach(row=>{
     row.onclick=()=>toggleStep(d,row.dataset.step);
   });
+  const copyScript=document.getElementById('copy-script-btn');
+  copyScript.dataset.label='台本コピー';
+  copyScript.onclick=()=>copyText(day.script||'',copyScript);
+  const copyMosh=document.getElementById('copy-mosh-btn');
+  copyMosh.dataset.label='コピー';
+  copyMosh.onclick=()=>copyText(day.mosh||day.b||'',copyMosh);
   showScreen('detail');
 }
 
