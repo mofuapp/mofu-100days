@@ -87,6 +87,7 @@ body::before{
   background:linear-gradient(135deg,var(--purple) 0%,#B89AE8 100%);
   color:var(--white);border:none;box-shadow:0 4px 0 #6B5B95;
   cursor:pointer;transition:transform .15s;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation;
 }
 .next-card:active{transform:scale(.98)}
 .next-card .card-title{color:var(--white)}
@@ -255,7 +256,7 @@ body::before{
       </div>
     </div>
 
-    <div class="card next-card" id="next-card">
+    <div class="card next-card" id="next-card" role="button" tabindex="0" aria-label="次に作るDayを開く">
       <div class="next-day-num" id="next-day-num">NEXT UP</div>
       <div class="next-title" id="next-title">Day1 を作ろう！</div>
       <div class="next-steps" id="next-steps"></div>
@@ -561,7 +562,7 @@ function renderList(phaseFilter){
 function renderFocus(){
   const items=DAYS.filter(d=>isWip(d.d));
   const el=document.getElementById('focus-list');
-  el.innerHTML=items.length?items.map(renderDayItem).join('':
+  el.innerHTML=items.length?items.map(renderDayItem).join(''):
     '<div class="empty-msg">制作中のコンテンツはまだないよ 🎬<br>一覧から Day を選んで始めよう！</div>';
   el.querySelectorAll('.day-item').forEach(item=>{
     item.onclick=()=>openDetail(parseInt(item.dataset.day));
