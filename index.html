@@ -364,7 +364,7 @@ body::before{
       <div class="mosh-text" id="detail-mosh"></div>
     </div>
     <div class="info-box hw-box">
-      <div class="info-box-title">✅ 受講生の宿題</div>
+      <div class="info-box-title" id="detail-homework-title">✅ 受講生の宿題</div>
       <div class="hw-text" id="detail-homework"></div>
     </div>
     <div class="section-label">制作ステップ（自分用チェック）</div>
@@ -568,6 +568,8 @@ function openDetail(d){
   document.getElementById('detail-script').innerHTML=formatScript(day.script||'');
   document.getElementById('detail-demo').innerHTML=(day.demo||[]).map(s=>`<li>${esc(s)}</li>`).join('');
   document.getElementById('detail-mosh').textContent=day.mosh||day.b||'';
+  document.getElementById('detail-homework-title').textContent=
+    day.d===44?'🎯 課題：自分のアイコンを作ってみよう':'✅ 受講生の宿題';
   document.getElementById('detail-homework').textContent=day.homework||'';
   document.getElementById('detail-memo').value=st.memo||'';
   document.getElementById('step-list').innerHTML=STEPS.map(s=>`

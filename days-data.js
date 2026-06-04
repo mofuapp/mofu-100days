@@ -978,7 +978,7 @@ window.COURSE_DAYS = [
       "Discordに報告"
     ],
     "mosh": "1:1・顔アップ・アイコン向き。SNSアイコン向け。 Midjourney実践Day。",
-    "homework": "Day44の成果物をDiscord #day44-share に投稿してください。"
+    "homework": "【課題】自分のアイコンを作ってみよう。動画のプロンプトで1枚作り、400×400で保存。完成したアイコン画像をDiscord #day44-share に投稿してください。"
   },
   {
     "d": 45,

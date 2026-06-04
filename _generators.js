@@ -124,9 +124,12 @@ function genMidjourney(d, title, brief, mk) {
   if (m) {
     const prep = d >= 47 ? ['メモ帳（設定シート）', 'Midjourney', 'Discord'] : ['Midjourney', 'Discord', 'MJ定番プロンプト', 'メモ帳'];
     const demo = m.demo || ['/imagine 入力', 'グリッド確認', 'U1拡大', '保存'];
+    const homework = d === 44
+      ? '【課題】自分のアイコンを作ってみよう。動画のプロンプトで1枚作り、400×400で保存。完成したアイコン画像をDiscord #day44-share に投稿してください。'
+      : `Day${d}の成果物をDiscord #day${d}-share に投稿してください。`;
     return mk(d, title, d === 35 || d === 49 || d === 50 ? '6〜8分' : '5〜7分', prep, m.main, demo,
       brief + ' Midjourney実践Day。',
-      `Day${d}の成果物をDiscord #day${d}-share に投稿してください。`);
+      homework);
   }
   return mk(d, title, '5〜7分', ['Midjourney', 'Discord'], `【本編】\n${brief}`, ['/imagine', '保存'], brief, '成果物をDiscordにシェア。');
 }
